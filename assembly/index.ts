@@ -26,6 +26,8 @@ export function uplink(): i32 {
   const seq_number = data.getInteger("seq_number");
   const seq_number_number: i64 = seq_number === null ? 0:seq_number.valueOf();
 
+  log(detect_type_string)
+
   let clickType: i64 = 0;
   let clickTypeName: string = "";
   let batteryLevel: f64 = 0;

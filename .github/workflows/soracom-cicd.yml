@@ -56,4 +56,4 @@ jobs:
       - name: view result
         env:
           result: ${{steps.deploy.outputs.result}}
-                run: echo $result
+        run: echo $result

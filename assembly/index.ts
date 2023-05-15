@@ -32,20 +32,16 @@ export function uplink(): i32 {
   let clickTypeName: string = "";
   let batteryLevel: f64 = 0;
   
-  if (detect_type_string === "Single short click") {
-    log("single");
+  if (detect_type_string == "Single short click") {
     clickType = 1;
     clickTypeName = "SINGLE";
-  } else if (detect_type_string === "Double short click") {
-    log("double");
+  } else if (detect_type_string == "Double short click") {
     clickType = 2;
     clickTypeName = "DOUBLE";
-  } else if (detect_type_string === "Single long click"){
-    log("long")
+  } else if (detect_type_string == "Single long click"){
     clickType = 3;
     clickTypeName = "LONG";
   } else {
-    log(`no type: ${detect_type_string}`)
     clickType = 0;
     clickTypeName = "NaN";
   }

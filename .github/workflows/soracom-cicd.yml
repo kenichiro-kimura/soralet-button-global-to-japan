@@ -54,4 +54,6 @@ jobs:
           soracom_soralet_filename: soralet-optimized.wasm
           soracom_delete_old_soralet: true
       - name: view result
-        run: echo ${{ steps.deploy.result }}
+        env:
+          result: ${{steps.deploy.outputs.result}}
+                run: echo $result

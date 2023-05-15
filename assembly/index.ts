@@ -21,57 +21,44 @@ export function uplink(): i32 {
   // create a new encoder which will be used to generate final JSON string
   const encoder = new JSONEncoder();
 
-  let name: string = "";
-  const nameOrNull = data.getString("name");
-  if (nameOrNull != null) {
-    name = nameOrNull.valueOf();
-  }
-  encoder.setString("name", name);
+  const detect_type = data.getString("detect_type");
+  const detect_type_string: string = detect_type === null ? "":detect_type.valueOf();
+  const seq_number = data.getInteger("seq_number");
+  const seq_number_number: i64 = seq_number === null ? 0:seq_number.valueOf();
 
-  // get location information
-  const location = getLocation();
-  if (location.lat.toString() == "NaN") {
-    encoder.setNull("lat");
+  let clickType: i64 = 0;
+  let clickTypeName: string = "";
+  let batteryLevel: f64 = 0;
+  
+  if (detect_type_string === "Single short click") {
+      clickType = 1;
+      clickTypeName = "SINGLE";
+  } else if (detect_type_string === "Double short click") {
+      clickType = 2;
+      clickTypeName = "DOUBLE";
+  } else if (detect_type_string === "Single long click"){
+      clickType = 3;
+      clickTypeName = "LONG";
   } else {
-    encoder.setFloat("lat", location.lat);
+      clickType = 0;
+      clickTypeName = "NaN";
   }
-  if (location.lon.toString() == "NaN") {
-    encoder.setNull("lon");
+
+  // calicurate batteryLevel only from seq_number(0-4095)
+  if (seq_number_number < 1024){
+    batteryLevel = 1.0;
+  } else if (seq_number_number < 2048){
+    batteryLevel = 0.75;
+  } else if (seq_number_number < 3072){
+    batteryLevel = 0.5;
   } else {
-    encoder.setFloat("lon", location.lon);
+    batteryLevel = 0.25;
   }
 
-  // get tag value with its name
-  const tagname = getTagValue("name");
-  encoder.setString("tagname", tagname);
-  const tagorg = getTagValue("org");
-  encoder.setString("tagorg", tagorg);
-
-  // get source value with its name
-  const resourceType = getSourceValue("resourceType");
-  encoder.setString("resourceType", resourceType);
-  const resourceId = getSourceValue("resourceId");
-  encoder.setString("resourceId", resourceId);
-
-  encoder.setInteger("timestamp", getTimestamp());
-
-  // add additional calculation based on device name
-  let value: f64 = 0;
-  const valueOrNull = data.getNum("value");
-  if (valueOrNull != null) {
-    value = valueOrNull.valueOf();
-  }
-  if (name == "sorao") {
-    encoder.setFloat("value", value / 100);
-  } else if (name == "sorako") {
-    encoder.setFloat("value", value * 10);
-  } else {
-    encoder.setInteger("value", -1);
-  }
-
-  encoder.setString("userdata", getUserdata());
-
-  log("Hello Orbit!");
+  encoder.setInteger("clickType", clickType);
+  encoder.setString("clickTypeName", clickTypeName);
+  encoder.setFloat("batteryLevel", batteryLevel);
+  encoder.setBoolean("binaryParserEnabled", true);
 
   // set output JSON. Note that we have to wrap result with {}
   setOutputJSON("{" + encoder.toString() + "}");
